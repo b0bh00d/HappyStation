@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<language id='44'>
+<page id="1266" title="SecAdminText" descr="SecAdminVarious" voice="no">
+	<!--LOG MESSAGES-->
+	<t id="1">$STATION$ in $SECTOR$ was granted $AMOUNT$ Cr to address a production deficit. New balance is $MONEY$ Cr.</t>
+	<t id="2">Station Made Happy</t>
+	<!---->
+</page>
+</language>

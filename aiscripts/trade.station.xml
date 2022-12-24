@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<diff>
+    <replace sel="/aiscript[@name='trade.station']/params/param[@name='debugchance']">
+        <param name="debugchance" default="100"/>
+    </replace>
+    <replace sel="/aiscript[@name='trade.station']/interrupts/handler[1]/actions/do_if[1]" pos="after">
+        <do_if value="not @$belowbudget and (this.station.productionmoney gt 0) and (event.param2 lt this.station.productionmoney)">
+            <debug_text text="'money below budget. Money: ' + event.param2 + ' Min budget: ' + this.station.productionmoney" chance="$debugchance"/>
+            <set_value name="$belowbudget" exact="true" />
+            <do_if value="player.age" min="@$nextbudgetwarning">
+                <set_value name="$nextbudgetwarning" exact="player.age + 5min" />
+            </do_if>
+        </do_if>
+        <do_if value="@$belowbudget and (player.age gt @$nextCheck) and not (@this.$SecAdmin == this)">
+            <set_value name="$nextCheck" exact="player.age + 5min"/>
+            <!-- First, try granting the station twice what is needed -->
+            <set_value name="$grant" exact="(this.station.productionmoney - this.station.money) * 2"/>
+            <do_if value="(@$grant gt faction.player.money)">
+                <!-- The player is short on funds, so just try the deficit amount -->
+                <set_value name="$grant" exact="this.station.productionmoney - this.station.money"/>
+            </do_if>
+            <!-- Is the player currently having to panhandle at a local bar? -->
+            <do_if value="(@$grant gt faction.player.money)">
+                <!-- Display the standard nag notification, if so -->
+                <run_interrupt_script name="'player.interaction.budget'"/>
+            </do_if>
+            <do_else>
+                <transfer_money from="faction.player" to="this.container" amount="$grant"/>
+                <substitute_text text="$logtext" source="{1266,1}" comment="$STATION$ in $SECTOR$ was granted $AMOUNT$ Cr to address a production deficit. New balance is $MONEY$ Cr.">
+                    <replace string="'$STATION$'" with="this.container.knownname" />
+                    <replace string="'$SECTOR$'" with="this.sector.knownname" />
+                    <replace string="'$AMOUNT$'" with="$grant.formatted.default" />
+                    <replace string="'$MONEY$'" with="this.container.money.formatted.default" />
+                </substitute_text>
+                <write_to_logbook category="upkeep" object="this.container" title="{1266,2}" text="$logtext" money="$grant" interaction="showonmap"/>
+                <!-- Flash it on the main event ticker -->
+                <show_notification text="$logtext" sound="ui_notification_player_alert_01"/>
+                <!-- This station is now happy! -->
+                <set_value name="$belowbudget" exact="false" />
+            </do_else>
+        </do_if>
+    </replace>
+</diff>
