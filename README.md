@@ -26,3 +26,6 @@ If I end up understanding how to do it (if it can be done at all), I will update
 
 ## Installing
 You can do a git clone of this repo into a folder called "HappyStation" in your game's local `extensions` folder, or you can simply extract the provided release into the same location (it's already bundled in its target folder).
+
+# §
+You might also find [Happy Crew](https://github.com/b0bh00d/HappyCrew) to be a useful X4 mod.  Have a look!
